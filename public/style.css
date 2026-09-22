@@ -34,14 +34,28 @@ button.danger { background: #c92a2a; }
 .todo-list { list-style: none; padding: 0; margin: 1.25rem 0 0; }
 .todo-item {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.4rem;
   padding: 0.6rem 0;
   border-top: 1px solid #eee;
 }
-.todo-title { flex: 1; }
+.todo-row { display: flex; align-items: center; gap: 0.5rem; }
+.todo-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.todo-image { display: flex; align-items: center; gap: 0.5rem; }
+.todo-thumb {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+.image-form { display: flex; align-items: center; gap: 0.5rem; }
+.image-form > input[type=file] { flex: 1; min-width: 0; font-size: 0.8rem; }
 .completed .todo-title { text-decoration: line-through; color: #868e96; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-.add-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.add-form { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+.add-form > input[type=text] { flex: 1; min-width: 8rem; width: auto; }
+.add-form > input[type=file] { flex: 1; min-width: 8rem; font-size: 0.8rem; }
 .empty { color: #868e96; margin-top: 1.25rem; }
 .links { margin-top: 1rem; font-size: 0.9rem; }

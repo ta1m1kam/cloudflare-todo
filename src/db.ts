@@ -11,6 +11,7 @@ export type Todo = {
   user_id: string;
   title: string;
   completed: number;
+  image_key: string | null;
   created_at: number;
 };
 
@@ -66,15 +67,39 @@ export const listTodos = async (db: D1Database, userId: string): Promise<Todo[]>
   return results;
 };
 
+export const findTodo = (
+  db: D1Database,
+  todoId: string,
+  userId: string,
+): Promise<Todo | null> =>
+  db
+    .prepare("SELECT * FROM todos WHERE id = ? AND user_id = ?")
+    .bind(todoId, userId)
+    .first<Todo>();
+
 export const insertTodo = async (
   db: D1Database,
-  userId: string,
-  title: string,
+  todo: Pick<Todo, "id" | "user_id" | "title" | "image_key">,
 ): Promise<void> => {
   await db
-    .prepare("INSERT INTO todos (id, user_id, title, completed, created_at) VALUES (?, ?, ?, 0, ?)")
-    .bind(crypto.randomUUID(), userId, title, Date.now())
+    .prepare(
+      "INSERT INTO todos (id, user_id, title, completed, image_key, created_at) VALUES (?, ?, ?, 0, ?, ?)",
+    )
+    .bind(todo.id, todo.user_id, todo.title, todo.image_key, Date.now())
     .run();
+};
+
+export const updateTodoImageKey = async (
+  db: D1Database,
+  todoId: string,
+  userId: string,
+  imageKey: string | null,
+): Promise<boolean> => {
+  const { meta } = await db
+    .prepare("UPDATE todos SET image_key = ? WHERE id = ? AND user_id = ?")
+    .bind(imageKey, todoId, userId)
+    .run();
+  return meta.changes > 0;
 };
 
 export const toggleTodo = async (

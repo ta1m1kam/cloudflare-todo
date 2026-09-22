@@ -11,5 +11,11 @@
       "database_name": "cloudflare-todo",
       "database_id": "daafec5b-831a-4d29-be87-7910617c9e83"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "IMAGES",
+      "bucket_name": "cloudflare-todo-images"
+    }
   ]
 }
