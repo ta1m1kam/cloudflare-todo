@@ -59,3 +59,27 @@ button.danger { background: #c92a2a; }
 .add-form > input[type=file] { flex: 1; min-width: 8rem; font-size: 0.8rem; }
 .empty { color: #868e96; margin-top: 1.25rem; }
 .links { margin-top: 1rem; font-size: 0.9rem; }
+.toolbar-actions { display: flex; align-items: center; gap: 0.75rem; }
+select {
+  padding: 0.45rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+.api-key-form { margin-bottom: 1rem; }
+.scopes { border: 1px solid #eee; border-radius: 6px; margin: 0 0 0.75rem; padding: 0.5rem 0.75rem; }
+.scopes legend { font-size: 0.85rem; color: #868e96; }
+label.checkbox { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem; }
+label.checkbox > input { width: auto; }
+.hint { color: #868e96; font-size: 0.85rem; margin: 0; }
+.table-scroll { overflow-x: auto; }
+.api-key-table { width: 100%; border-collapse: collapse; margin-top: 1.25rem; font-size: 0.8rem; }
+.api-key-table th, .api-key-table td { border-top: 1px solid #eee; padding: 0.4rem 0.3rem; text-align: left; vertical-align: middle; }
+.api-key-table th { color: #868e96; font-weight: 600; white-space: nowrap; }
+.api-key-value {
+  background: #f1f3f5;
+  border-radius: 6px;
+  padding: 0.75rem;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}

@@ -11,11 +11,14 @@ export const TodoList = ({ email, todos, error }: TodoListProps) => (
   <Layout title="Todo一覧">
     <div class="toolbar">
       <h1>{email} のTodo</h1>
-      <form method="post" action="/logout">
-        <button type="submit" class="secondary">
-          ログアウト
-        </button>
-      </form>
+      <div class="toolbar-actions">
+        <a href="/settings/api-keys">APIキー</a>
+        <form method="post" action="/logout">
+          <button type="submit" class="secondary">
+            ログアウト
+          </button>
+        </form>
+      </div>
     </div>
     <div class="card">
       {error ? <p class="error">{error}</p> : null}

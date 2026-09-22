@@ -3,6 +3,7 @@ const MIN_PASSWORD_LENGTH = 8;
 const MAX_TITLE_LENGTH = 200;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_API_KEY_NAME_LENGTH = 50;
 
 export const validateCredentials = (email: string, password: string): string | null => {
   if (!EMAIL_PATTERN.test(email)) {
@@ -30,6 +31,16 @@ export const validateImage = (image: File): string | null => {
   }
   if (image.size > MAX_IMAGE_SIZE) {
     return "画像は5MB以下のファイルを選択してください";
+  }
+  return null;
+};
+
+export const validateApiKeyName = (name: string): string | null => {
+  if (name.length === 0) {
+    return "キーの名前を入力してください";
+  }
+  if (name.length > MAX_API_KEY_NAME_LENGTH) {
+    return `キーの名前は${MAX_API_KEY_NAME_LENGTH}文字以内で入力してください`;
   }
   return null;
 };

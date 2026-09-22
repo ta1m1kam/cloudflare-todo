@@ -5,7 +5,7 @@ const SALT_BYTES = 16;
 export const SESSION_COOKIE_NAME = "session";
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-const toHex = (bytes: Uint8Array): string =>
+export const toHex = (bytes: Uint8Array): string =>
   Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 
 const fromHex = (hex: string): Uint8Array =>

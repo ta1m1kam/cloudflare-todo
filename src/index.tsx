@@ -2,7 +2,17 @@ import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { csrf } from "hono/csrf";
 import { createMiddleware } from "hono/factory";
+import { secureHeaders } from "hono/secure-headers";
 import type { Context } from "hono";
+import { api } from "./api";
+import {
+  MAX_API_KEYS_PER_USER,
+  apiKeyPrefix,
+  buildScopes,
+  expiresAtFromOption,
+  generateApiKey,
+  hashApiKey,
+} from "./apiKeys";
 import {
   SESSION_COOKIE_NAME,
   SESSION_TTL_MS,
@@ -11,26 +21,35 @@ import {
   verifyPassword,
 } from "./auth";
 import {
+  countApiKeys,
+  deleteApiKey,
   deleteSession,
   deleteTodo,
   findSessionWithUser,
   findTodo,
   findUserByEmail,
+  insertApiKey,
   insertSession,
   insertTodo,
   insertUser,
+  listApiKeys,
   listTodos,
   toggleTodo,
   updateTodoImageKey,
 } from "./db";
-import type { User } from "./db";
+import type { AppEnv } from "./env";
 import { deleteTodoImage, getTodoImage, putTodoImage } from "./storage";
-import { validateCredentials, validateImage, validateTodoTitle } from "./validation";
+import {
+  validateApiKeyName,
+  validateCredentials,
+  validateImage,
+  validateTodoTitle,
+} from "./validation";
+import { ApiKeyCreated } from "./views/ApiKeyCreated";
+import { ApiKeys } from "./views/ApiKeys";
 import { Login } from "./views/Login";
 import { Signup } from "./views/Signup";
 import { TodoList } from "./views/TodoList";
-
-type AppEnv = { Bindings: Env; Variables: { user: User } };
 
 const LOGIN_FAILED_MESSAGE = "メールアドレスまたはパスワードが正しくありません";
 
@@ -63,6 +82,7 @@ const readFormImage = async (c: Context, name: string): Promise<File | null> => 
 };
 
 const TODO_NOT_FOUND_MESSAGE = "Todoが見つかりません";
+const API_KEY_NOT_FOUND_MESSAGE = "APIキーが見つかりません";
 const IMAGE_NOT_FOUND_MESSAGE = "画像が見つかりません";
 const IMAGE_REQUIRED_MESSAGE = "画像ファイルを選択してください";
 
@@ -70,6 +90,12 @@ const renderTodoList = async (c: Context<AppEnv>, error?: string) => {
   const user = c.get("user");
   const todos = await listTodos(c.env.DB, user.id);
   return c.html(<TodoList email={user.email} todos={todos} error={error} />);
+};
+
+const renderApiKeys = async (c: Context<AppEnv>, error?: string) => {
+  const user = c.get("user");
+  const apiKeys = await listApiKeys(c.env.DB, user.id);
+  return c.html(<ApiKeys email={user.email} apiKeys={apiKeys} error={error} />);
 };
 
 const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
@@ -92,12 +118,17 @@ const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
 });
 
 const app = new Hono<AppEnv>();
+const screenCsrf = csrf();
 
-app.use("*", csrf());
+app.use("*", secureHeaders({ referrerPolicy: "strict-origin-when-cross-origin" }));
+app.use("*", (c, next) => (c.req.path.startsWith("/api/") ? next() : screenCsrf(c, next)));
 app.use("/", requireAuth);
 app.use("/todos", requireAuth);
 app.use("/todos/*", requireAuth);
+app.use("/settings/*", requireAuth);
 app.use("/logout", requireAuth);
+
+app.route("/api/v1", api);
 
 app.get("/signup", (c) => c.html(<Signup />));
 
@@ -241,6 +272,45 @@ app.post("/todos/:id/image/delete", async (c) => {
     await updateTodoImageKey(c.env.DB, todo.id, user.id, null);
   }
   return c.redirect("/");
+});
+
+app.get("/settings/api-keys", (c) => renderApiKeys(c));
+
+app.post("/settings/api-keys", async (c) => {
+  const user = c.get("user");
+  const body = await c.req.parseBody();
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  const expires = typeof body.expires === "string" ? body.expires : "never";
+  const validationError = validateApiKeyName(name);
+  if (validationError) {
+    return renderApiKeys(c, validationError);
+  }
+  if ((await countApiKeys(c.env.DB, user.id)) >= MAX_API_KEYS_PER_USER) {
+    return renderApiKeys(
+      c,
+      `APIキーは最大${MAX_API_KEYS_PER_USER}本までです。不要なキーを失効してください`,
+    );
+  }
+  const key = generateApiKey();
+  await insertApiKey(c.env.DB, {
+    id: crypto.randomUUID(),
+    user_id: user.id,
+    name,
+    key_prefix: apiKeyPrefix(key),
+    key_hash: await hashApiKey(key),
+    scopes: buildScopes(body.write === "on"),
+    expires_at: expiresAtFromOption(expires),
+    last_used_at: null,
+  });
+  return c.html(<ApiKeyCreated name={name} apiKey={key} />);
+});
+
+app.post("/settings/api-keys/:id/delete", async (c) => {
+  const user = c.get("user");
+  if (!(await deleteApiKey(c.env.DB, c.req.param("id"), user.id))) {
+    return c.text(API_KEY_NOT_FOUND_MESSAGE, 404);
+  }
+  return c.redirect("/settings/api-keys");
 });
 
 export default app;
