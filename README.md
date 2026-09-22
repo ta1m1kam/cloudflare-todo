@@ -46,3 +46,14 @@ src/
 - Cookie は HttpOnly / SameSite=Lax / Path=/ 付きで、HTTPS でアクセスされたときのみ Secure を付与します。
 - フォーム POST は `hono/csrf` で保護しています。
 - Todo のクエリはすべて `user_id` で絞り込むため、他ユーザーの Todo は操作できません。
+
+## デプロイ
+
+```sh
+pnpm wrangler login                             # 初回のみ。ブラウザで Cloudflare にログイン
+pnpm wrangler d1 migrations apply DB --remote   # リモート D1 にマイグレーションを適用
+pnpm run deploy                                 # Worker と public/ をデプロイ
+```
+
+D1 データベースは `wrangler d1 create cloudflare-todo` で作成済みで、その `database_id` を wrangler.jsonc に設定しています。
+別アカウントで動かす場合は同コマンドで作り直し、`database_id` を差し替えてください。
