@@ -1,0 +1,26 @@
+{
+  "name": "cloudflare-todo",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "db:migrate": "wrangler d1 migrations apply DB --local",
+    "types": "wrangler types",
+    "deploy": "wrangler deploy"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.5.1",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "dependencies": {
+    "hono": "4.13.8"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "wrangler": "4.136.0"
+  },
+  "private": true
+}

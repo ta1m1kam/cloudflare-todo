@@ -1,0 +1,47 @@
+:root { color-scheme: light dark; }
+body {
+  margin: 0;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  background: #f5f5f7;
+  color: #1b1b1f;
+}
+main { max-width: 32rem; margin: 0 auto; }
+h1 { font-size: 1.4rem; margin-bottom: 1rem; }
+.card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+label { display: block; margin-bottom: 0.75rem; font-size: 0.9rem; }
+input[type=email], input[type=password], input[type=text] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+button {
+  padding: 0.45rem 0.9rem;
+  border: 0;
+  border-radius: 6px;
+  background: #3b5bdb;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+button.secondary { background: #868e96; }
+button.danger { background: #c92a2a; }
+.error { color: #c92a2a; margin-bottom: 1rem; font-size: 0.9rem; }
+.todo-list { list-style: none; padding: 0; margin: 1.25rem 0 0; }
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid #eee;
+}
+.todo-title { flex: 1; }
+.completed .todo-title { text-decoration: line-through; color: #868e96; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.add-form { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.empty { color: #868e96; margin-top: 1.25rem; }
+.links { margin-top: 1rem; font-size: 0.9rem; }
